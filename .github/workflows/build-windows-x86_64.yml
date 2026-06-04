@@ -58,7 +58,7 @@ jobs:
       - name: Generate hashed key for download cache
         shell: bash
         run: |
-          INPUT_HASH=$(echo "${{ runner.os }}-${{ inputs.version }}-${{ inputs.extensions }}" | sha256sum | awk '{print $1}')
+          INPUT_HASH=$(echo "${{ runner.os }}-${{ inputs.version }}-${{ inputs.extensions }}-libzip-zlib" | sha256sum | awk '{print $1}')
           echo "INPUT_HASH=${INPUT_HASH}" >> "$GITHUB_ENV"
 
       # Cache downloaded source
@@ -88,9 +88,6 @@ jobs:
 
       - run: ./bin/spc doctor
 
-      # List available libs for debugging
-      - run: ./bin/spc list-libs
-
       # If there's no dependencies cache, fetch sources, with or without debug
       - if: steps.cache-download.outputs.cache-hit != 'true'
         run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" --for-libs="libzip,zlib" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }} ${{ env.SPC_WITHOUT_SUGGESTS }}
@@ -100,11 +97,12 @@ jobs:
 
       # Always print logs even if build fails
       - if: always()
+        shell: pwsh
         run: |
           echo "=== OUTPUT LOG ==="
-          type D:\a\static-php-cli\static-php-cli\log\spc.output.log
+          if (Test-Path "log\spc.output.log") { Get-Content "log\spc.output.log" } else { echo "No output log found" }
           echo "=== SHELL LOG ==="
-          type D:\a\static-php-cli\static-php-cli\log\spc.shell.log
+          if (Test-Path "log\spc.shell.log") { Get-Content "log\spc.shell.log" } else { echo "No shell log found" }
 
       # Always upload logs even if build fails
       - if: always()
@@ -112,8 +110,9 @@ jobs:
         with:
           name: build-logs
           path: |
-            D:\a\static-php-cli\static-php-cli\log\spc.output.log
-            D:\a\static-php-cli\static-php-cli\log\spc.shell.log
+            log/spc.output.log
+            log/spc.shell.log
+          if-no-files-found: ignore
 
       # Upload cli executable
       - if: ${{ inputs.build-cli == true }}
