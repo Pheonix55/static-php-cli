@@ -29,8 +29,17 @@ jobs:
         run: ./spc.exe download --with-php=8.3 --for-extensions="pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium"
 
       - name: Build
+        env:
+          CL: /std:c++17
         run: |
-          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium" --build-cli --with-hardcoded-ini="post_max_size=128M" --with-hardcoded-ini="upload_max_filesize=128M" --with-hardcoded-ini="memory_limit=512M" --with-hardcoded-ini="max_execution_time=0" --with-hardcoded-ini="max_input_time=300" --debug
+          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium" `
+            --build-cli `
+            --with-hardcoded-ini="post_max_size=128M" `
+            --with-hardcoded-ini="upload_max_filesize=128M" `
+            --with-hardcoded-ini="memory_limit=512M" `
+            --with-hardcoded-ini="max_execution_time=0" `
+            --with-hardcoded-ini="max_input_time=300" `
+            --debug
 
       - name: Upload logs on failure
         if: failure()
