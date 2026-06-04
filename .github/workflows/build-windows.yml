@@ -4,7 +4,7 @@ on:
     
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       
@@ -16,7 +16,7 @@ jobs:
 
       - name: Build
         run: |
-          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium" --build-cli --with-ini-set="post_max_size=128M" --with-ini-set="upload_max_filesize=128M" --with-ini-set="memory_limit=512M" --with-ini-set="max_execution_time=0" --with-ini-set="max_input_time=300"
+          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium" --build-cli --with-hardcoded-ini="post_max_size=128M" --with-hardcoded-ini="upload_max_filesize=128M" --with-hardcoded-ini="memory_limit=512M" --with-hardcoded-ini="max_execution_time=0" --with-hardcoded-ini="max_input_time=300"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
