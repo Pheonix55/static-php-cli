@@ -1,0 +1,25 @@
+name: Build PHP Windows
+on:
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download SPC
+        run: curl -L -o spc.exe https://github.com/crazywhalecc/static-php-cli/releases/latest/download/spc-windows-x64.exe
+
+      - name: Download Sources
+        run: ./spc.exe download --with-php=8.3 --for-extensions="pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium"
+
+      - name: Build
+        run: |
+          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium" --build-cli --with-ini-set="post_max_size=128M" --with-ini-set="upload_max_filesize=128M" --with-ini-set="memory_limit=512M" --with-ini-set="max_execution_time=0" --with-ini-set="max_input_time=300"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-windows-x64
+          path: buildroot/bin/php.exe
