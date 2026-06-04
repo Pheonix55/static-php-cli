@@ -8,12 +8,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
+      - name: Install NASM
+        run: choco install nasm -y
+
+      - name: Install Strawberry Perl
+        run: choco install strawberryperl -y
+
+      - name: Refresh PATH
+        run: |
+          echo "C:\Strawberry\perl\bin" >> $env:GITHUB_PATH
+          echo "C:\Program Files\NASM" >> $env:GITHUB_PATH
+
       - name: Download SPC
         run: curl -L -o spc.exe https://github.com/crazywhalecc/static-php-cli/releases/latest/download/spc-windows-x64.exe
 
       - name: Setup PHP SDK Binary Tools
-        run: |
-          git clone --depth=1 https://github.com/php/php-sdk-binary-tools.git php-sdk-binary-tools
+        run: git clone --depth=1 https://github.com/php/php-sdk-binary-tools.git php-sdk-binary-tools
 
       - name: Download Sources
         run: ./spc.exe download --with-php=8.3 --for-extensions="pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium"
