@@ -26,13 +26,13 @@ jobs:
         run: git clone --depth=1 https://github.com/php/php-sdk-binary-tools.git php-sdk-binary-tools
 
       - name: Download Sources
-        run: ./spc.exe download --with-php=8.3 --for-extensions="pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium"
+        run: ./spc.exe download --with-php=8.3 --for-extensions="pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,fileinfo,mbstring,openssl,curl,bcmath"
 
       - name: Build
         env:
           CL: /std:c++17
         run: |
-          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,gd,fileinfo,mbstring,openssl,curl,bcmath,intl,sodium" `
+          ./spc.exe build "pdo_mysql,pdo_sqlite,mysqli,zip,xml,simplexml,fileinfo,mbstring,openssl,curl,bcmath" `
             --build-cli `
             --with-hardcoded-ini="post_max_size=128M" `
             --with-hardcoded-ini="upload_max_filesize=128M" `
