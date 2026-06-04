@@ -88,12 +88,32 @@ jobs:
 
       - run: ./bin/spc doctor
 
+      # List available libs for debugging
+      - run: ./bin/spc list-libs
+
       # If there's no dependencies cache, fetch sources, with or without debug
       - if: steps.cache-download.outputs.cache-hit != 'true'
-        run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }} ${{ env.SPC_WITHOUT_SUGGESTS }}
+        run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" --for-libs="libzip,zlib" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }} ${{ env.SPC_WITHOUT_SUGGESTS }}
 
       # Run build command
-      - run: ./bin/spc build "${{ inputs.extensions }}" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }} ${{ env.SPC_WITHOUT_SUGGESTS }}
+      - run: ./bin/spc build "${{ inputs.extensions }}" --with-libs="libzip,zlib" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }} ${{ env.SPC_WITHOUT_SUGGESTS }}
+
+      # Always print logs even if build fails
+      - if: always()
+        run: |
+          echo "=== OUTPUT LOG ==="
+          type D:\a\static-php-cli\static-php-cli\log\spc.output.log
+          echo "=== SHELL LOG ==="
+          type D:\a\static-php-cli\static-php-cli\log\spc.shell.log
+
+      # Always upload logs even if build fails
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            D:\a\static-php-cli\static-php-cli\log\spc.output.log
+            D:\a\static-php-cli\static-php-cli\log\spc.shell.log
 
       # Upload cli executable
       - if: ${{ inputs.build-cli == true }}
