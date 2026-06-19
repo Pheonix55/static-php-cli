@@ -85,10 +85,10 @@ jobs:
       # These must be explicitly declared here, or the curl static build fails with
       # exit code 1 during its CMake build step (library naming/linking mismatch).
       - if: steps.cache-download.outputs.cache-hit != 'true'
-        run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" --for-libs="libzip,zlib,openssl,nghttp2,zstd,brotli,libssh2" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }}
+        run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" --for-libs="libzip,zlib,openssl,nghttp2,libssh2" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }}
 
       # Run build command
-      - run: ./bin/spc build "${{ inputs.extensions }}" --with-libs="libzip,zlib,openssl,nghttp2,zstd,brotli,libssh2" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }}
+      - run: ./bin/spc build "${{ inputs.extensions }}" --with-libs="libzip,zlib,openssl,nghttp2,libssh2" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }}
 
       # Always print logs even if build fails
       - if: always()
