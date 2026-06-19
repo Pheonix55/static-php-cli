@@ -28,10 +28,6 @@ on:
         description: prefer pre-built binaries (reduce build time)
         type: boolean
         default: true
-      without-suggested-libs:
-        description: Disable suggested libs
-        type: boolean
-        default: false
       debug:
         description: enable debug logs
         type: boolean
@@ -75,10 +71,6 @@ jobs:
       - if: inputs.prefer-pre-built == true
         run: echo "SPC_PRE_BUILT=--prefer-pre-built" >> $env:GITHUB_ENV
 
-      # Disable suggested libs only if explicitly set to true
-      - if: inputs.without-suggested-libs == true
-        run: echo "SPC_WITHOUT_SUGGESTS=--without-suggests" >> $env:GITHUB_ENV
-
       # With target select: cli, micro or both
       - if: ${{ inputs.build-cli == true }}
         run: echo "SPC_BUILD_CLI=--build-cli" >> $env:GITHUB_ENV
@@ -89,11 +81,14 @@ jobs:
       - run: ./bin/spc doctor
 
       # If there's no dependencies cache, fetch sources, with or without debug
+      # NOTE: curl pulls in nghttp2, zstd, brotli, and libssh2 as dependencies on Windows.
+      # These must be explicitly declared here, or the curl static build fails with
+      # exit code 1 during its CMake build step (library naming/linking mismatch).
       - if: steps.cache-download.outputs.cache-hit != 'true'
-        run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" --for-libs="libzip,zlib" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }} ${{ env.SPC_WITHOUT_SUGGESTS }}
+        run: ./bin/spc download --with-php="${{ inputs.version }}" --for-extensions="${{ inputs.extensions }}" --for-libs="libzip,zlib,openssl,nghttp2,zstd,brotli,libssh2" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_PRE_BUILT }}
 
       # Run build command
-      - run: ./bin/spc build "${{ inputs.extensions }}" --with-libs="libzip,zlib" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }} ${{ env.SPC_WITHOUT_SUGGESTS }}
+      - run: ./bin/spc build "${{ inputs.extensions }}" --with-libs="libzip,zlib,openssl,nghttp2,zstd,brotli,libssh2" ${{ env.SPC_BUILD_DEBUG }} ${{ env.SPC_BUILD_CLI }} ${{ env.SPC_BUILD_MICRO }}
 
       # Always print logs even if build fails
       - if: always()
