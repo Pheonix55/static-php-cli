@@ -99,7 +99,7 @@ class WindowsCMakeExecutor extends Executor
     /**
      * Add configure args.
      */
-    public function addConfigureArgs(...$args): static
+    public function addConfigureArgs(string ...$args): static
     {
         $this->configure_args = [...$this->configure_args, ...$args];
         return $this;
@@ -108,7 +108,7 @@ class WindowsCMakeExecutor extends Executor
     /**
      * Remove some configure args, to bypass the configure option checking for some libs.
      */
-    public function removeConfigureArgs(...$args): static
+    public function removeConfigureArgs(string ...$args): static
     {
         $this->ignore_args = [...$this->ignore_args, ...$args];
         return $this;
@@ -189,6 +189,10 @@ class WindowsCMakeExecutor extends Executor
     {
         return $this->custom_default_args ?? [
             '-A x64',
+            // CMake 4.x hard-errors on projects requesting compatibility with CMake < 3.5
+            // (e.g. wineditline). This is the documented escape hatch; modern projects and
+            // older CMake releases ignore it.
+            '-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
             '-DCMAKE_BUILD_TYPE=Release',
             '-DBUILD_SHARED_LIBS=OFF',
             '-DBUILD_STATIC_LIBS=ON',
